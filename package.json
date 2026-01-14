@@ -1,0 +1,11 @@
+{
+  "name": "bershama-plus",
+  "version": "1.0.0",
+  "main": "api/bot.js",
+  "dependencies": {
+    "telegraf": "^4.16.3",
+    "@google/generative-ai": "^0.11.4",
+    "@supabase/supabase-js": "^2.43.4",
+    "node-fetch": "^2.7.0"
+  }
+}
