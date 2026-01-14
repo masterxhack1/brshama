@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <style>
+        body { background-color: #0c0c0c; color: #d4af37; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .container { max-width: 900px; margin: 50px auto; padding: 20px; border: 1px solid #d4af37; border-radius: 15px; box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+        h1 { text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 12px; text-align: center; }
+        th { background-color: #d4af37; color: #000; }
+        .ban-btn { background: #ff4d4d; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px; }
+        .unban-btn { background: #28a745; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>لوحة تحكم Matrex_gen 🛠️</h1>
+        <div id="stats">جاري تحميل البيانات...</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>المستخدم</th>
+                    <th>ID</th>
+                    <th>الأسئلة</th>
+                    <th>الحالة</th>
+                    <th>الإجراء</th>
+                </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+        const supabase = createClient('SUPABASE_URL', 'SUPABASE_KEY');
+
+        async function loadUsers() {
+            const { data: users } = await supabase.from('users').select('*');
+            const table = document.getElementById('userTable');
+            table.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.username}</td>
+                    <td>${user.user_id}</td>
+                    <td>${user.usage_count}</td>
+                    <td>${user.is_banned ? 'محظور 🚫' : 'نشط ✅'}</td>
+                    <td>
+                        <button class="${user.is_banned ? 'unban-btn' : 'ban-btn'}" 
+                                onclick="toggleBan('${user.user_id}', ${user.is_banned})">
+                            ${user.is_banned ? 'إلغاء الحظر' : 'حظر'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        window.toggleBan = async (id, currentStatus) => {
+            await supabase.from('users').update({ is_banned: !currentStatus }).eq('user_id', id);
+            loadUsers();
+        };
+        loadUsers();
+    </script>
+</body>
+</html>
